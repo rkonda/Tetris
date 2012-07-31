@@ -1,8 +1,10 @@
+package game.tetris;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-class Board extends Observable {
+public class Board extends Observable {
 	
 	// The board is represented as an array of arrays, with 10 rows and 10
 	// columns.

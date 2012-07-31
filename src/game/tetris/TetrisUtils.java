@@ -1,3 +1,4 @@
+package game.tetris;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -7,7 +8,7 @@ import java.io.InputStream;
  * TetrisUtils provides a single function, getInput(), used for responding to user keystrokes.
  * NOTE(philc): Much of this input IO code was lifted from the Internet.
  */
-class TetrisUtils {
+public class TetrisUtils {
   public static String LEFT = "LEFT";
   public static String UP = "UP";
   public static String RIGHT = "RIGHT";

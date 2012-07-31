@@ -1,3 +1,5 @@
+package game.tetris;
+
 
 class CollisionManager {
 	

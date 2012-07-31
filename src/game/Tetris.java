@@ -1,3 +1,9 @@
+package game;
+
+
+import game.tetris.Board;
+import game.tetris.TetrisUtils;
+
 import java.io.IOException;
 import java.util.*;
 

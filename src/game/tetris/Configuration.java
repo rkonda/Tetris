@@ -1,3 +1,5 @@
+package game.tetris;
+
 
 class Configuration {
 	private static int WIDTH = 10;
