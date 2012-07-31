@@ -176,7 +176,6 @@ class Board {
 			System.out.print("*");
 		System.out.println();
 
-		char output;
 		for (int row = 0; row < HEIGHT; row++) {
 			System.out.print("|");
 			for (int col = 0; col < WIDTH; col++) {
