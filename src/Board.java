@@ -167,6 +167,7 @@ class Board extends Observable {
 	int currentPieceIndex = 0;
 	int currentRow = 0;
 	int currentCol = 0;
+	CollisionManager collisionManager = new CollisionManager(this);
 	
 	void createNewPiece() {
 
@@ -175,7 +176,7 @@ class Board extends Observable {
 		currentRow = 0;
 		currentCol = 0;
 
-		if (isColliding()) {
+		if (collisionManager.isColliding()) {
 			this.scoreManager.endGame();
 			return;
 		}
@@ -187,7 +188,7 @@ class Board extends Observable {
 	}
 
 	public synchronized void switchPiece( int[][] newPiece ) {
-		if( isOutside(newPiece) || isColliding(newPiece) ) {
+		if( collisionManager.isOutside(newPiece) || collisionManager.isColliding(newPiece) ) {
 			return;
 		}
 
@@ -267,143 +268,10 @@ class Board extends Observable {
 		
 		switchPiece(newPiece);
 	}
-	
-	boolean isAtLeftBorder() {
-		return currentCol <= 0;
-	}
 
-	boolean isAtRightBorder() {
-		return currentCol + getPieceWidth() >= WIDTH;
-	}
-
-	boolean isAtBottomBorder() {
-		return currentRow + getPieceHeight() >= HEIGHT;
-	}
-
-	// will the specified piece be outside the boundaries of the game if it were to replace the current piece
-	boolean isOutside(int[][] newPiece) {
-		return currentCol + newPiece[0].length > WIDTH ||
-				currentRow + newPiece.length > HEIGHT;
-	}
-	
-	// is the newly added piece colliding?
-	boolean isColliding() {
-		for (int row = 0; row < getPieceHeight(); row++) {
-			for (int col = 0; col < getPieceWidth(); col++) {
-				if (currentPiece[row][col] != 0 && 
-					board[currentRow + row][currentCol + col] != 0) 
-				{
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	// will the current piece be colliding if it moved
-	boolean isColliding(int horizontal, int downwards) {
-
-		int boardBackup[][] = new int[HEIGHT][WIDTH];
-
-		// backup the board
-		for (int row = 0; row < HEIGHT; row++) {
-			for (int col = 0; col < WIDTH; col++) {
-				if (board[row][col] != 0) {
-					boardBackup[row][col] = 1;
-				}
-			}
-		}
-
-		// unset the current piece from the board
-		for (int row = 0; row < getPieceHeight(); row++) {
-			for (int col = 0; col < getPieceWidth(); col++) {
-				if( currentPiece[row][col] != 0 ) {
-					board[currentRow + row][currentCol + col] = 0;
-				}
-			}
-		}
-
-		boolean isColliding = false;
-
-		// check if the current piece would collide with existing pieces on the
-		// board, when moved
-		for (int row = 0; row < getPieceHeight(); row++) {
-			for (int col = 0; col < getPieceWidth(); col++) {
-				if (currentPiece[row][col] != 0 && 
-					board[currentRow + row + downwards][currentCol + col + horizontal] != 0) 
-				{
-					isColliding = true;
-					break;
-				}
-			}
-		}
-
-		// get the board back to the original state
-		for (int row = 0; row < HEIGHT; row++) {
-			for (int col = 0; col < WIDTH; col++) {
-				if (boardBackup[row][col] != 0) {
-					board[row][col] = 1;
-				}
-			}
-		}
-
-		return isColliding;
-	}
-
-	// will the given piece be colliding if it replaced the current piece?
-	boolean isColliding(int[][] newPiece) {
-
-		int boardBackup[][] = new int[HEIGHT][WIDTH];
-
-		// backup the board
-		for (int row = 0; row < HEIGHT; row++) {
-			for (int col = 0; col < WIDTH; col++) {
-				if (board[row][col] != 0) {
-					boardBackup[row][col] = 1;
-				}
-			}
-		}
-
-		// unset the current piece from the board
-		for (int row = 0; row < getPieceHeight(); row++) {
-			for (int col = 0; col < getPieceWidth(); col++) {
-				if( currentPiece[row][col] != 0 ) {
-					board[currentRow + row][currentCol + col] = 0;
-				}
-			}
-		}
-
-		boolean isColliding = false;
-
-		// check if the current piece would collide with existing pieces on the
-		// board, when moved
-		for (int row = 0; row < newPiece.length; row++) {
-			for (int col = 0; col < newPiece[0].length; col++) {
-				if (newPiece[row][col] != 0 && 
-					board[currentRow + row][currentCol + col] != 0) 
-				{
-					isColliding = true;
-					break;
-				}
-			}
-		}
-
-		// get the board back to the original state
-		for (int row = 0; row < HEIGHT; row++) {
-			for (int col = 0; col < WIDTH; col++) {
-				if (boardBackup[row][col] != 0) {
-					board[row][col] = 1;
-				}
-			}
-		}
-
-		return isColliding;
-	}
-	
 	public synchronized boolean moveLeft() {
 
-		if (isAtLeftBorder() || isColliding(-1, 0)) {
+		if (collisionManager.isAtLeftBorder() || collisionManager.isColliding(-1, 0)) {
 			return false;
 		}
 
@@ -414,10 +282,9 @@ class Board extends Observable {
 		return true;
 	}
 
-
 	public synchronized boolean moveRight() {
 
-		if (isAtRightBorder() || isColliding(1, 0)) {
+		if (collisionManager.isAtRightBorder() || collisionManager.isColliding(1, 0)) {
 			return false;
 		}
 
@@ -429,8 +296,12 @@ class Board extends Observable {
 	}
 
 	public synchronized boolean moveDown() {
+		return moveDown(true);
+	}
+	
+	public synchronized boolean moveDown(boolean doPrint) {
 
-		if (isAtBottomBorder() || isColliding(0, 1)) {
+		if (collisionManager.isAtBottomBorder() || collisionManager.isColliding(0, 1)) {
 			removeCompletedRows();
 			createNewPiece();
 			return false;
@@ -438,9 +309,16 @@ class Board extends Observable {
 
 		setCurrentPiece(0, 1);
 
-		notifyPieceMoved();
+		if(doPrint)
+			notifyPieceMoved();
 		
 		return true;
+	}
+
+	public synchronized void moveToBottom() {
+		while ( moveDown(false) );
+		
+		notifyPieceMoved();
 	}
 
 }

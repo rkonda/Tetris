@@ -14,13 +14,20 @@ class Tetris {
 				break;
 			}
 
+			// Movements
 			if (key == (int) 'j') {
 				board.moveLeft();
 			} else if (key == (int) 'k') {
 				board.moveRight();
 			} else if (key == (int) 'm') {
 				board.moveDown();
-			} else if (key == (int) 'r') {
+			} else if (key == (int) 'z') {
+				board.moveToBottom();
+			} 
+			
+			
+			// Other transformations
+			else if (key == (int) 'r') {
 				board.rotate();
 			} else if (key == (int) 'e') {
 				board.mirrorUp();
