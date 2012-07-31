@@ -4,7 +4,6 @@ import java.util.*;
 class Tetris {
 	public static void main(String[] args) {
 		Board board = new Board();
-		board.print();
 
 		while (!board.hasGameEnded()) {
 
@@ -40,7 +39,6 @@ class Tetris {
 
 	public static void main_mac(String[] args) {
 		Board board = new Board();
-		board.print();
 
 		while (!board.hasGameEnded()) {
 

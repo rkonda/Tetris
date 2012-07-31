@@ -57,15 +57,11 @@ class ScoreManager implements Observer {
 		
 	public void update(Observable arg0, Object arg1) {
 		if(board.newPieceCreated) {
-			board.newPieceCreated = false;
-			
 			eventHandler_newPieceCreated();
 			return;
 		}
 		
 		if(board.rowCompleted) {
-			board.rowCompleted = false;
-			
 			eventHandler_rowCompleted();
 			return;
 		}

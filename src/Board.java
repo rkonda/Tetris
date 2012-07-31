@@ -10,6 +10,47 @@ class Board extends Observable {
 	int[][] board;
 	ScoreManager scoreManager = new ScoreManager(this);
 
+	boolean boardCreated = false;
+	void notifyBoardCreated() {
+		boardCreated = true;
+		setChanged();
+		notifyObservers();
+		boardCreated = false;
+	}
+
+	boolean rowCompleted = false;
+	private void notifyRowCompleted() {
+		rowCompleted = true;
+		setChanged();
+		notifyObservers();
+		rowCompleted = false;
+	}
+	
+	boolean newPieceCreated = false;
+	private void notifyNewPieceCreated() {
+		newPieceCreated = true;
+		setChanged();
+		notifyObservers();
+		newPieceCreated = false;
+	}
+
+	boolean pieceMoved = false;
+	private void notifyPieceMoved() {
+		pieceMoved = true;
+		setChanged();
+		notifyObservers();
+		pieceMoved = false;
+	}
+
+	boolean pieceSwitched = false;
+	private void notifyPieceSwitched() {
+		pieceSwitched = true;
+		setChanged();
+		notifyObservers();
+		pieceSwitched = false;
+	}
+	
+
 	public Board() {
 		Configuration.load(this);
 		
@@ -20,7 +61,10 @@ class Board extends Observable {
 		createNewPiece();
 
 		addObserver(this.scoreManager);
+		addObserver( new ConsoleView(this));
 		scoreManager.setTimer();
+
+		notifyBoardCreated();
 	}
 
 	public int[][] getBoard() {
@@ -54,45 +98,6 @@ class Board extends Observable {
 	void loadPieces() {
 		Configuration.loadPieces(this);
 	}
-
-	/*
-	 * Prints the contents of the board and draws a border around it.
-	 */
-	public synchronized void print() {
-		System.out.println("level=" + this.scoreManager.level + ", score=" + this.scoreManager.score + ", period=" + this.scoreManager.period);
-		
-		for (int col = 0; col < WIDTH + 2; col++)
-			System.out.print("*");
-		System.out.println();
-
-		for (int row = 0; row < HEIGHT; row++) {
-			System.out.print("|");
-			for (int col = 0; col < WIDTH; col++) {
-				int value = board[row][col];
-				System.out.print(value == 0 ? " " : "#");
-			}
-			System.out.println("|");
-		}
-
-		for (int col = 0; col < WIDTH + 2; col++)
-			System.out.print("*");
-		System.out.println();
-		
-		//System.out.println();
-		//printCurrent();
-	}
-
-	void printCurrent() {
-		for (int row = 0; row < getPieceHeight(); row++) {
-			for (int col = 0; col < getPieceWidth(); col++) {
-				if( currentPiece[row][col] == 0 )
-					System.out.print(" ");
-				else
-					System.out.print("#");
-			}
-			System.out.println();
-		}
-	}
 	
 	void setCurrentPiece(int horizontal, int downwards) {
 		// set pieces on the board
@@ -118,8 +123,6 @@ class Board extends Observable {
 			}
 		}
 	}
-
-	boolean rowCompleted = false;
 	
 	void removeCompletedRows() {
 		for (int row = 0; row < HEIGHT; row++) {
@@ -133,10 +136,6 @@ class Board extends Observable {
 			}
 
 			if (!foundUnfilledColumn) {
-
-				rowCompleted = true;
-				setChanged();
-				notifyObservers();
 
 				for (int row2 = row - 1; row2 >= 0; row2--) {
 					for (int col = 0; col < WIDTH; col++) {
@@ -153,7 +152,8 @@ class Board extends Observable {
 					board[0][col] = 0;
 				}
 
-				print();
+				notifyRowCompleted();
+
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
@@ -168,8 +168,6 @@ class Board extends Observable {
 	int currentRow = 0;
 	int currentCol = 0;
 	
-	boolean newPieceCreated = false;
-
 	void createNewPiece() {
 
 		PieceChooser.choose(this);
@@ -182,9 +180,7 @@ class Board extends Observable {
 			return;
 		}
 
-		newPieceCreated = true;
-		setChanged();
-		notifyObservers();
+		notifyNewPieceCreated();
 
 		// starting offset for the piece
 		setCurrentPiece(2, 0);
@@ -215,7 +211,7 @@ class Board extends Observable {
 			}
 		}
 		
-		print();
+		notifyPieceSwitched();
 	}
 
 	public int[][] getRotatedPiece() {
@@ -404,40 +400,47 @@ class Board extends Observable {
 
 		return isColliding;
 	}
-
-	public synchronized void moveLeft() {
+	
+	public synchronized boolean moveLeft() {
 
 		if (isAtLeftBorder() || isColliding(-1, 0)) {
-			return;
+			return false;
 		}
 
 		setCurrentPiece(-1, 0);
 
-		print();
+		notifyPieceMoved();
+		
+		return true;
 	}
 
-	public synchronized void moveRight() {
+
+	public synchronized boolean moveRight() {
 
 		if (isAtRightBorder() || isColliding(1, 0)) {
-			return;
+			return false;
 		}
 
 		setCurrentPiece(1, 0);
 
-		print();
+		notifyPieceMoved();
+		
+		return true;
 	}
 
-	public synchronized void moveDown() {
+	public synchronized boolean moveDown() {
 
 		if (isAtBottomBorder() || isColliding(0, 1)) {
 			removeCompletedRows();
 			createNewPiece();
-			return;
+			return false;
 		}
 
 		setCurrentPiece(0, 1);
 
-		print();
+		notifyPieceMoved();
+		
+		return true;
 	}
 
 }
