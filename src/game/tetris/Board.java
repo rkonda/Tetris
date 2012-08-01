@@ -11,7 +11,9 @@ public class Board extends Observable {
 	int HEIGHT, WIDTH;
 	int[][] board;
 	ScoreManager scoreManager = new ScoreManager(this);
-
+	String configurationFilePath;
+	Configuration configuration;
+	
 	boolean boardCreated = false;
 	void notifyBoardCreated() {
 		boardCreated = true;
@@ -53,9 +55,10 @@ public class Board extends Observable {
 	}
 	
 
-	public Board() {
-		Configuration.load(this);
-		
+	public Board(String configurationFilePath) {
+		this.configurationFilePath = configurationFilePath;
+		configuration = new Configuration(this);
+
 		board = new int[HEIGHT][WIDTH];
 		
 		loadPieces();
@@ -98,7 +101,7 @@ public class Board extends Observable {
 	}
 
 	void loadPieces() {
-		Configuration.loadPieces(this);
+		configuration.loadPieces();
 	}
 	
 	void setCurrentPiece(int horizontal, int downwards) {

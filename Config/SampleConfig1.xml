@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Board WIDTH="10" HEIGHT="20">
+	</Board>
+	<Pieces>
+		<Piece name="rectangle">
+			<Location row="0" col="0" />
+			<Location row="0" col="1" />
+			<Location row="0" col="2" />
+			<Location row="0" col="3" />
+		</Piece>
+		<Piece name="square">
+			<Location row="0" col="0" />
+			<Location row="0" col="1" />
+			<Location row="1" col="0" />
+			<Location row="1" col="1" />
+		</Piece>
+		<Piece name="snake">
+			<Location row="0" col="0" />
+			<Location row="0" col="1" />
+			<Location row="1" col="1" />
+			<Location row="1" col="2" />
+		</Piece>
+		<Piece name="shortHammer">
+			<Location row="0" col="0" />
+			<Location row="0" col="1" />
+			<Location row="0" col="2" />
+			<Location row="1" col="1" />
+		</Piece>
+		<Piece name="hammer">
+			<Location row="1" col="1" />
+			<Location row="1" col="2" />
+			<Location row="1" col="3" />
+			<Location row="2" col="2" />
+			<Location row="3" col="2" />
+		</Piece>
+	</Pieces>
+</Configuration>
+
+
+
+

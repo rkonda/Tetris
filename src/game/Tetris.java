@@ -9,7 +9,12 @@ import java.util.*;
 
 class Tetris {
 	public static void main(String[] args) {
-		Board board = new Board();
+		String configurationFilePath = "";
+		if( args.length > 0 ) {
+			configurationFilePath = args[0];
+		}
+		
+		Board board = new Board(configurationFilePath);
 
 		while (!board.hasGameEnded()) {
 
@@ -51,7 +56,12 @@ class Tetris {
 	}
 
 	public static void main_mac(String[] args) {
-		Board board = new Board();
+		String configurationFilePath = "";
+		if( args.length > 0 ) {
+			configurationFilePath = args[0];
+		}
+		
+		Board board = new Board(configurationFilePath);
 
 		while (!board.hasGameEnded()) {
 
