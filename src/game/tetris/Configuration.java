@@ -1,16 +1,22 @@
 package game.tetris;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.*;
 import javax.xml.xpath.*;
 
+//import net.sf.json.*;
+import org.json.*;
+
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
+import org.apache.commons.io.IOUtils;
 
 class Configuration {
 	private Board board;
@@ -19,22 +25,28 @@ class Configuration {
 	Configuration(Board board) {
 		this.board = board;
 		try {
-			loadConfigurationFromFile();
+			loadConfigurationFromXML();
 		} catch(Exception exception) {
-			System.out.println("Unable to read from configuration file.");
-			loadDefaults();
+			System.out.println("Unable to read from xml configuration file.");
+			try {
+				loadConfigurationFromJSON();
+			} catch( Exception anyException ) {
+				System.out.println("Unable to read from json configuration file.");
+				loadDefaults();
+			}
 		}
 	}
 	
-	private void loadConfigurationFromFile() 
+	private void loadConfigurationFromXML() 
 			throws ParserConfigurationException, SAXException, IOException, XPathExpressionException 
 	{		
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		File configFile = new File(board.configurationFilePath);
 		if(!configFile.exists()) {
 			configFile = new File("Config\\SampleConfig1.xml");
 		}
+
+		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 		Document document = documentBuilder.parse(configFile);
 		
 		document.normalize();
@@ -107,7 +119,63 @@ class Configuration {
 		return piece;
 	}
 	
-	private void loadDefaults() {		
+	private void loadConfigurationFromJSON() throws IOException, JSONException {
+		String configFilePath = board.configurationFilePath;
+		File configFile = new File(board.configurationFilePath);
+		if(!configFile.exists()) {
+			configFilePath = "Config\\SampleConfig1.json";
+			configFile = new File(configFilePath);
+		}
+
+        //InputStream is = Configuration.class.getResourceAsStream( configFilePath );
+        InputStream is = new FileInputStream(configFile);
+        String jsonTxt = IOUtils.toString( is );
+        
+        JSONObject json = (JSONObject) new JSONObject( jsonTxt );        
+        
+        JSONObject boardJson = json.getJSONObject("Board");
+        board.HEIGHT = boardJson.getInt("HEIGHT");
+        board.WIDTH = boardJson.getInt("WIDTH");
+        
+		JSONArray piecesJsonArray = json.getJSONArray("Pieces");
+		pieces = new ArrayList<int[][]>();
+		for( int pieceIndex = 0; pieceIndex < piecesJsonArray.length(); pieceIndex++ ) {
+			JSONObject pieceJson = (JSONObject) piecesJsonArray.get(pieceIndex);
+			JSONArray locationsJsonArray = pieceJson.getJSONArray("Locations");
+			int rowMin = Integer.MAX_VALUE, colMin = Integer.MAX_VALUE;
+			int rowMax = Integer.MIN_VALUE, colMax = Integer.MIN_VALUE;
+			List<int[]> locations = new ArrayList<int[]>();
+			for( int locationIndex = 0; locationIndex < locationsJsonArray.length(); locationIndex++ ) {
+				JSONObject location = (JSONObject) locationsJsonArray.get(locationIndex);
+				int row = location.getInt("row");
+				int col = location.getInt("col");
+				locations.add(new int[] { row, col });
+				
+				if(row > rowMax) {
+					rowMax = row;
+				}
+				if(row < rowMin) {
+					rowMin = row;
+				}
+				if(col > colMax) {
+					colMax = col;
+				}
+				if(col < colMin) {
+					colMin = col;
+				}
+			}
+			
+			int[][] piece = new int[rowMax - rowMin + 1][colMax - colMin + 1];
+			for( int[] location : locations ) {
+				piece[location[0] - rowMin][location[1] - colMin] = 1;
+			}
+			
+			pieces.add(piece);
+		}
+		
+	}
+	
+	private void loadDefaults() {
 		board.HEIGHT = 20;
 		board.WIDTH = 10;
 

@@ -1,0 +1,61 @@
+{
+	"Board":{ "WIDTH":"10", "HEIGHT":"20" },
+	"Pieces":
+		[
+			{
+				"name":"rectangle",
+				"Locations": 
+					[
+						{"row":"0", "col":"0"},
+						{"row":"0", "col":"1"},
+						{"row":"0", "col":"2"},
+						{"row":"0", "col":"3"}
+					]
+			},
+			{
+				"name":"square",
+				"Locations": 
+					[
+						{"row":"0", "col":"0"},
+						{"row":"0", "col":"1"},
+						{"row":"1", "col":"0"},
+						{"row":"1", "col":"1"}
+					]
+			},
+			{
+				"name":"snake",
+				"Locations":
+					[
+						{"row":"0", "col":"0"},
+						{"row":"0", "col":"1"},
+						{"row":"1", "col":"1"},
+						{"row":"1", "col":"2"}
+					]
+			},
+			{
+				"name":"shortHammer",
+				"Locations": 
+					[
+						{"row":"0", "col":"0"},
+						{"row":"0", "col":"1"},
+						{"row":"0", "col":"2"},
+						{"row":"1", "col":"1"}
+					]
+			},
+			{
+				"name":"hammer",
+				"Locations":
+					[
+						{"row":"1", "col":"1"},
+						{"row":"1", "col":"2"},
+						{"row":"1", "col":"3"},
+						{"row":"2", "col":"2"},
+						{"row":"3", "col":"2"}
+					]
+			}
+		]
+}
+
+
+
+
